@@ -11,14 +11,14 @@
             {
                 $.ajaxSetup({ cache: false });
                 ChangeProgress();
-                ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+                ProgressIntervalHandle = setInterval("ChangeProgress()", 4000);
             });
 
             function StartMapper()
             {
                 $.get('@Url.Action("StartMapper")');
                 ChangeProgress();
-                ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+                ProgressIntervalHandle = setInterval("ChangeProgress()", 4000);
             }
 
             function ChangeProgress()

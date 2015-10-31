@@ -8,8 +8,6 @@
 
         $(document).ready(function()
         {
-            commandField.onkeyup = commandKeyUp;
-
             $.ajaxSetup({ cache: false });
 
             refresh();
@@ -47,9 +45,9 @@
             $("#ServerOutput").animate({ scrollTop: $("#ServerOutput")[0].scrollHeight }, 1000);
         }
 
-        function commandKeyUp(e)
+        function commandKeyDown(e)
         {
-            if (e.key == "Enter" && commandField.value != "")
+            if ((e.key == "Enter" || e.keyIdentifier == "Enter") && commandField.value != "")
                 sendCommand(commandField.value);
         }
     </script>
@@ -63,11 +61,12 @@
         <td>
             <button onclick="startServer()">Start Server</button>
             <button onclick="sendCommand('stop')">Stop Server</button>
+            @Html.ActionLink("Change Properties", "Properties")
         </td>
     </tr>
     <tr>
         <td>
-            <input id="commandField" type="text" style="width: 86%" />
+            <input id="commandField" type="text" style="width: 86%" onkeydown="commandKeyDown(event)" />
             <input type="button" value="Send" onclick="sendCommand()" style="width: 10%; float: right" />
         </td>
     </tr>
