@@ -1,0 +1,152 @@
+﻿@{ ViewBag.Title = "Admin Page"; }
+
+@section HeadContent
+{
+    <style type="text/css">
+        td, th
+        {
+            text-align: center;
+            border-width: 1px;
+            border-style: solid;
+        }
+    </style>
+    <script type="text/javascript">
+        var ProgressIntervalHandle;
+
+        $(document).ready(function()
+        {
+            $.ajaxSetup({ cache: false });
+            ChangeProgress();
+            ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+        });
+
+        function StartUpdate()
+        {
+            $.get('@Url.Action("UpdateServer")');
+            ChangeProgress();
+            ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+        }
+
+        function ChangeProgress()
+        {
+            $.get('@Url.Action("UpdateProgress")', function(result)
+            {
+
+                if (result == "")
+                    $("#UpdateProgress").text("");
+                else
+                    $("#UpdateProgress").text("(" + result + ")");
+
+                if (result == "Completed" || result == "")
+                    clearInterval(ProgressIntervalHandle);
+            });
+        }
+    </script>
+}
+
+<h2>Admin Page</h2>
+
+Server Status: @ViewData["ServerStatus"]<br />
+<br />
+
+Server Admin Commands:<br />
+@Html.ActionLink("Kill Server", "KillServer")<br />
+<a href="#" onclick="StartUpdate(); return false;">Update Server</a>
+<span id="UpdateProgress"></span><br />
+<br />
+
+@using (Html.BeginForm("SetPingIP", "Admin"))
+{
+    @:Set Ping IP to Ignore:
+    <input type="text" name="ip"
+           value="@System.Configuration.ConfigurationManager.AppSettings["AzurePingIP"]" />
+    <input type="submit" value="Set" />
+}
+<br />
+
+@using (Html.BeginForm("ApproveAccount", "Admin"))
+{
+    @:Approve User:
+    <input type="text" name="username" />
+    <input type="submit" value="Approve" />
+}
+<br />
+
+@using (Html.BeginForm("AssignRole", "Admin"))
+{
+    @:Assign User:
+    <input type="text" name="username" />
+    @:to role:
+    @Html.DropDownList("role", Roles.GetAllRoles()
+        .Select(r => new SelectListItem() { Text = r, Value = r }), "")
+    <input type="submit" value="Assign" />
+}
+<br />
+
+@using (Html.BeginForm("RetractRole", "Admin"))
+{
+    @:Retract User:
+    <input type="text" name="username" />
+    @:from role:
+    @Html.DropDownList("role", Roles.GetAllRoles()
+        .Select(r => new SelectListItem() { Text = r, Value = r }), "")
+    <input type="submit" value="Retract" />
+}
+<br />
+
+@using (Html.BeginForm("UnlockAccount", "Admin"))
+{
+    @:Unlock User:
+    <input type="text" name="username" />
+    <input type="submit" value="Unlock" />
+}
+<br />
+
+@using (Html.BeginForm("DeleteAccount", "Admin"))
+{
+    @:Delete User:
+    <input type="text" name="username" />
+    <input type="submit" value="Delete!" />
+}
+<br />
+
+List of all User Accounts:
+<table cellspacing="0" cellpadding="4" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <th>Username</th>
+        <th>E-Mail</th>
+        <th>Approved?</th>
+        <th>Locked Out?</th>
+        <th>Last Activity</th>
+        <th>Roles</th>
+    </tr>
+    @foreach (MembershipUser user in Membership.GetAllUsers())
+    {
+        <tr>
+            <td>
+                @Html.ActionLink(user.UserName, "Profile", "Account",
+                    new { username = user.UserName }, null)
+            </td>
+            <td>
+                @user.Email
+            </td>
+            <td>
+                @user.IsApproved
+            </td>
+            <td>
+                @user.IsLockedOut
+            </td>
+            <td>
+                @user.LastActivityDate
+            </td>
+            <td>
+                @foreach (var role in Roles.GetRolesForUser(user.UserName))
+                {
+                    @:[@role]
+                }
+            </td>
+        </tr>
+    }
+</table>
+<br />
+

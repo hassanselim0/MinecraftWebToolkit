@@ -1,14 +1,66 @@
 ﻿<!DOCTYPE html>
-<html>
+<html style="height: 100%">
 <head>
     <meta charset="utf-8" />
     <title>@ViewBag.Title</title>
     <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
-    <script src="@Url.Content("~/Scripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/modernizr-2.5.3.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-2.1.4.min.js")" type="text/javascript"></script>
+    @*<script src="@Url.Content("~/Scripts/modernizr-2.5.3.js")" type="text/javascript"></script>*@
+
+    <script type="text/javascript">
+        var ServerStatusIntervalHandle;
+
+        $(document).ready(function()
+        {
+            $.ajaxSetup({ cache: false });
+            ChangeServerStatus();
+            ServerStatusIntervalHandle = setInterval("ChangeServerStatus()", 2000);
+        });
+
+        function ChangeServerStatus()
+        {
+            $.get('@Url.Action("ServerStatus", "Home")', function(result)
+            {
+
+                $("#ServerStatusSpan").html(result);
+
+                if (result == "Online")
+                    $("#ServerStatusSpan").css("color", "Green");
+                else
+                    $("#ServerStatusSpan").css("color", "Red");
+            });
+        }
+    </script>
+
+    @RenderSection("HeadContent", false)
 </head>
 
-<body>
+<body style="height: 94%">
+    <div style="float: right">
+        Welcome,
+        @{ var user = Membership.GetUser(); }
+        @if (user == null)
+        {
+            @:Guest! [@Html.ActionLink("Login", "Login", "Account")] [@Html.ActionLink("Sign-up", "Create", "Account")]
+        }
+        else
+        {
+            @:@Html.ActionLink(user.UserName, "Profile", "Account")! [@Html.ActionLink("Logout", "Logout", "Account")]
+        }
+    </div>
+    <h1>
+        Hassan Selim's Minecraft Server
+    </h1>
+    <div class="navbar">
+        <div style="float: right">
+            Server is <span id="ServerStatusSpan"><i>checking...</i></span>
+        </div>
+        @Html.ActionLink("Home", "", "")
+        @if (Roles.IsUserInRole("Player")) { @Html.ActionLink("Profile", "Profile", "Account") }
+        @if (Roles.IsUserInRole("Moderator")) { @Html.ActionLink("Server Console", "Console", "Server") }
+        @Html.ActionLink("Server Map", "Map", "Server")
+        @if (Roles.IsUserInRole("Admin")) { @Html.ActionLink("Admin Page", "", "Admin") }
+    </div>
     @RenderBody()
 </body>
 </html>

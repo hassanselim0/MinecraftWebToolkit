@@ -79,9 +79,9 @@ namespace McServerWebsite.Controllers
 
             if (string.IsNullOrEmpty(username))
                 username = Membership.GetUser().UserName;
-            else if (!Roles.IsUserInRole("Admin"))
+            else if (!Roles.IsUserInRole("Admin")) // Prevent non-admins from chaning other users' passwords
             {
-                FormsAuthentication.RedirectToLoginPage();      // Prevents non-admins from chaning other users' passwords
+                FormsAuthentication.RedirectToLoginPage();
                 return Redirect(FormsAuthentication.LoginUrl);
             }
 
@@ -118,9 +118,9 @@ namespace McServerWebsite.Controllers
                 MvcApplication.McServer.UserIPs[username] = Request.UserHostAddress;
                 MvcApplication.McServer.UserLastPing[username] = DateTime.UtcNow;
             }
-            else if (!Roles.IsUserInRole("Moderator"))
+            else if (!Roles.IsUserInRole("Moderator")) // Prevent non-moderators from viewing other users
             {
-                FormsAuthentication.RedirectToLoginPage();      // Prevents non-moderators from viewing other users
+                FormsAuthentication.RedirectToLoginPage();
                 return Redirect(FormsAuthentication.LoginUrl);
             }
 
@@ -134,9 +134,9 @@ namespace McServerWebsite.Controllers
 
             if (username == null)
                 username = Membership.GetUser().UserName;
-            else if (!Roles.IsUserInRole("Moderator"))
+            else if (!Roles.IsUserInRole("Moderator")) // Prevent non-moderators from White-listing other users
             {
-                FormsAuthentication.RedirectToLoginPage();      // Prevents non-moderators from White-listing other users
+                FormsAuthentication.RedirectToLoginPage();
                 return Redirect(FormsAuthentication.LoginUrl);
             }
 

@@ -1,0 +1,54 @@
+﻿@{ ViewBag.Title = "Server Map"; }
+
+@section HeadContent
+{
+    @if (Roles.IsUserInRole("Moderator"))
+    {
+        <script type="text/javascript">
+            var ProgressIntervalHandle;
+
+            $(document).ready(function()
+            {
+                $.ajaxSetup({ cache: false });
+                ChangeProgress();
+                ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+            });
+
+            function StartMapper()
+            {
+                $.get('@Url.Action("StartMapper")');
+                ChangeProgress();
+                ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+            }
+
+            function ChangeProgress()
+            {
+                $.get('@Url.Action("MapperProgress")', function(result)
+                {
+                    if (result == "")
+                        $("#MapperProgress").text("");
+                    else
+                        $("#MapperProgress").text("(Updating: " + result + ")");
+
+                    if (result == "Completed" || result == "")
+                    {
+                        clearInterval(ProgressIntervalHandle);
+                        $("#UpdateBtn").show();
+                    }
+                    else
+                        $("#UpdateBtn").hide();
+                });
+            }
+        </script>
+    }
+}
+
+<h2 style="display: inline-block; margin-right: 16px;">Server Map</h2>
+
+@if (Roles.IsUserInRole("Moderator"))
+{
+    <button id="UpdateBtn" style="display: none" onclick="StartMapper()">Update</button>
+    <span id="MapperProgress" style="font-style: italic"></span>
+}
+<iframe src="/mcmap" style="width: 100%; height: calc(100% - 140px);" />
+

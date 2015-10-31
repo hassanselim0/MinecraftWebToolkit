@@ -1,0 +1,23 @@
+﻿@{ ViewBag.Title = "Login"; }
+
+<h2>Login</h2>
+
+<div style="color: Red; font-weight: bold">@ViewData["error"]</div>
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "LoginForm" }))
+{
+    var returnurl = ViewData["returnurl"] ?? Request.QueryString["returnurl"];
+    <input type="hidden" name="returnUrl" value="@returnurl" />
+
+    <label>Username:</label><br />
+    <input name="username" type="text" /><br />
+
+    <label>Password:</label><br />
+    <input name="password" type="password" /><br />
+    <br />
+
+    <input type="submit" value="Login" />
+
+    <span>(don't have an account? @Html.ActionLink("create a new one here", "Create"))</span>
+}
+

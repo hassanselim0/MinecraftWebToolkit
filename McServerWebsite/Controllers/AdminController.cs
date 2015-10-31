@@ -51,6 +51,13 @@ namespace McServerWebsite.Controllers
             return RedirectToAction("");
         }
 
+        public ActionResult RetractRole(string username, string role)
+        {
+            Roles.RemoveUserFromRole(username, role);
+
+            return RedirectToAction("");
+        }
+
         public ActionResult UnlockAccount(string username)
         {
             Membership.GetUser(username).UnlockUser();
