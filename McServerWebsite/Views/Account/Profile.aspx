@@ -79,7 +79,7 @@
             </td>
         </tr>
         <% } %>
-        <tr>
+        <%--<tr>
             <td colspan="2">
                 <% if (!Model.IsApproved)
                    { %>
@@ -100,6 +100,6 @@
                            + ((DateTime)Session["WhitelistUntil"]).Subtract(DateTime.Now).TotalSeconds);
                    } %>
             </td>
-        </tr>
+        </tr>--%>
     </table>
 </asp:Content>

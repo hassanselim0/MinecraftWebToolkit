@@ -3,45 +3,51 @@
     font-size: .85em;
     font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
     color: #232323;
-    background-color: #fff;
+    background-color: #ffffff;
 }
 
 header,
 footer,
 nav,
-section {
+section
+{
     display: block;
 }
 
 /* Styles for basic forms
 -----------------------------------------------------------*/
 
-fieldset 
+fieldset
 {
-    border:1px solid #ddd;
-    padding:0 1.4em 1.4em 1.4em;
-    margin:0 0 1.5em 0;
+    border: 1px solid #ddd;
+    padding: 0 1.4em 1.4em 1.4em;
+    margin: 0 0 1.5em 0;
 }
 
-legend 
+legend
 {
-    font-size:1.2em;
+    font-size: 1.2em;
     font-weight: bold;
 }
 
-textarea 
+textarea
 {
     min-height: 75px;
 }
 
-.editor-label 
+a, a:visited
+{
+    color: #0000ee;
+}
+
+.editor-label
 {
     margin: 1em 0 0 0;
 }
 
-.editor-field 
+.editor-field
 {
-    margin:0.5em 0 0 0;
+    margin: 0.5em 0 0 0;
 }
 
 
@@ -72,4 +78,18 @@ textarea
 .validation-summary-valid
 {
     display: none;
+}
+
+.navbar
+{
+    background: #DDDDDD;
+    margin: 0px -8px;
+    padding: 8px;
+}
+
+.navbar a
+{
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 16px;
 }

@@ -21,10 +21,7 @@ namespace McServerWebsite
         {
             get
             {
-                lock (sync)
-                {
-                    return instance != null;
-                }
+                lock (sync) return instance != null;
             }
         }
 
@@ -35,7 +32,7 @@ namespace McServerWebsite
             lock (sync)
             {
                 instance = new KeepAlive();
-                instance.Insert();
+                instance.insert();
             }
         }
 
@@ -48,20 +45,19 @@ namespace McServerWebsite
             }
         }
 
-        private void Callback(string key, object value, CacheItemRemovedReason reason)
-        {
-            if (reason != CacheItemRemovedReason.Removed)
-            {
-                new WebClient().DownloadString("http://mc.hassanselim.me/Home/Ping?useless=" + DateTime.Now.Ticks);
-
-                Insert();
-            }
-        }
-
-        private void Insert()
+        private void insert()
         {
             HttpRuntime.Cache.Add("KeepAlive", this, null, Cache.NoAbsoluteExpiration,
-                TimeSpan.FromMinutes(20), CacheItemPriority.NotRemovable, Callback);
+                TimeSpan.FromMinutes(20), CacheItemPriority.NotRemovable, (key, value, reason) =>
+                {
+                    if (reason != CacheItemRemovedReason.Removed)
+                    {
+                        new WebClient().DownloadString(
+                            "http://vm.hassanselim.me/Home/Ping?useless=" + DateTime.Now.Ticks);
+
+                        insert();
+                    }
+                });
         }
     }
 }

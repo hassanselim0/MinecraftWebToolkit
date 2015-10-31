@@ -6,16 +6,14 @@ using System.Web.Mvc;
 
 namespace McServerWebsite.Controllers
 {
-    [NoCache]
+    [NoCache, Authorize(Roles = "Moderator")]
     public class ServerController : Controller
     {
-        [Authorize(Roles = "Moderator")]
         public ActionResult Console()
         {
             return View();
         }
 
-        [Authorize(Roles = "Moderator")]
         public ActionResult Start()
         {
             MvcApplication.McServer.Start();
@@ -23,7 +21,6 @@ namespace McServerWebsite.Controllers
             return Content("OK " + DateTime.Now.Ticks);
         }
 
-        [Authorize(Roles = "Moderator")]
         public ActionResult SendCommand(string command)
         {
             MvcApplication.McServer.SendCommand(command);
@@ -31,7 +28,6 @@ namespace McServerWebsite.Controllers
             return Content("OK " + DateTime.Now.Ticks);
         }
 
-        [Authorize(Roles = "Moderator")]
         public ActionResult GetOutput(string since)
         {
             if (MvcApplication.McServer.ConsoleHistory.Count == 0)
@@ -46,17 +42,18 @@ namespace McServerWebsite.Controllers
                 Output = MvcApplication.McServer.ConsoleHistory.SkipWhile((cm, i) => i <= startAfter)
                     .Aggregate("", (s1, s2) => s1 + HttpUtility.HtmlEncode(s2) + "<br />\r\n"),
                 LastMessage = MvcApplication.McServer.ConsoleHistory.Count - 1,
+                Ticks = DateTime.Now.Ticks,
             };
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        [AllowAnonymous]
         public ActionResult Map()
         {
             return View();
         }
 
-        [Authorize(Roles = "Moderator")]
         public ActionResult StartMapper()
         {
             Mapper.Start();
@@ -64,7 +61,6 @@ namespace McServerWebsite.Controllers
             return Content("OK " + DateTime.Now.Ticks);
         }
 
-        [Authorize(Roles = "Moderator")]
         public ActionResult MapperProgress()
         {
             var prog = Mapper.Progress;

@@ -18,7 +18,7 @@ namespace McServerWebsite
         public MinecraftServer()
         {
             var startInfo = new ProcessStartInfo(ConfigurationManager.AppSettings["JrePath"],
-                "-Xmx1024M -Xms512M -jar minecraft_server.jar nogui");
+                "-Xmx1024M -Xms512M -jar " + ConfigurationManager.AppSettings["McJarFile"] + " nogui");
             startInfo.WorkingDirectory = ConfigurationManager.AppSettings["McServerPath"];
             startInfo.RedirectStandardInput = startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false; // Necessary for Standard Stream Redirection

@@ -22,12 +22,7 @@ namespace McServerWebsite.Controllers
         [NoCache]
         public ActionResult ServerStatus()
         {
-            var user = System.Web.Security.Membership.GetUser();
-            if (user != null && user.IsApproved)
-            {
-                MvcApplication.McServer.UserIPs[user.UserName] = Request.UserHostAddress;
-                MvcApplication.McServer.UserLastPing[user.UserName] = DateTime.UtcNow;
-            }
+            userPing();
 
             if (HttpContext.Application["UpdateProgress"] != null)
                 return Content("Updating");
@@ -35,6 +30,27 @@ namespace McServerWebsite.Controllers
                 return Content("Online");
             else
                 return Content("Offline");
+        }
+
+        private void userPing()
+        {
+            var username = User.Identity.Name;
+
+            if (string.IsNullOrEmpty(username)) return;
+
+            var userIPs = MvcApplication.McServer.UserIPs;
+            var userLastPing = MvcApplication.McServer.UserLastPing;
+
+            if (userLastPing.ContainsKey(username) &&
+                DateTime.UtcNow.Subtract(userLastPing[username]).TotalMinutes < 1)
+                return;
+
+            var user = System.Web.Security.Membership.GetUser(username);
+            if (user != null && user.IsApproved)
+            {
+                userIPs[user.UserName] = Request.UserHostAddress;
+                userLastPing[user.UserName] = DateTime.UtcNow;
+            }
         }
     }
 }

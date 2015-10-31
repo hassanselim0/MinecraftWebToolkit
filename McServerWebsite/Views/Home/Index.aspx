@@ -17,11 +17,11 @@
         on multiplayer before they decide to purchase the game.</p>
     <p>
         Not verifying against minecraft.net causes a security threat where hackers can send
-        a false username and thus impersonating a user (connect as that user), so to avoif
+        a false username and thus impersonating a user (connect as that user), so to avoid
         this I made a white-list system that works as follows:</p>
     <ol>
         <li>Create an account on this website, and wait for me to approve it (sorry, I have
-            to do this because my computer can only handle very few players)</li>
+            to do this because this server can only handle very few players)</li>
         <li>Download a Minecraft Name Changer, I recommend 
             <a href="/MinecraftNameChanger.exe">this one</a></li>
         <li>Open the Name Changer and enter your username for this website when asked for the
@@ -31,12 +31,9 @@
         <li>When the launcher opens, don&#39;t type a password then press the Login button</li>
         <li>Ofcourse the login will fail, and a &quot;Play Offline&quot; button will appear,
             click on it to launch the game in offline mode</li>
-        <li>Go to your Profile page
-            <%= Html.ActionLink("here", "Profile", "Account") %>
-            and press on &quot;White-list Me&quot;, this will give you 2 minutes to connect
-            to my server before it removes you from the white-list again</li>
-        <li>Click on the &quot;Mulitplayer&quot; button and type &quot;mc.hassanselim.me&quot;
-            in the text box then press &quot;Connect&quot; and have fun !</li>
+        <li>Keep this website open while you are connecting to the server</li>
+        <li>Click on the &quot;Mulitplayer&quot; button and type &quot;vm.hassanselim.me&quot;
+            in the text box then press &quot;Connect&quot; and have fun!</li>
     </ol>
     <p>
         In case you bought the game and have a payed account on minecraft.net, then you
@@ -49,7 +46,7 @@
         play on my server and at the same time avoid impersonation by hackers.</p>
     <p>
         Have Fun,<br />
-        Hassan Aly Selim<br />
+        Hassan Selim<br />
         <a href="http://www.hassanselim.me/">hassanselim.me</a><br />
         <a href="http://twitter.com/hassanselim0">@hassanselim0</a></p>
 </asp:Content>

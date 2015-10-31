@@ -105,7 +105,8 @@ namespace McServerWebsite.Controllers
         }
 
         [Authorize]
-        public ActionResult Profile(string username)
+        [ActionName("Profile")]
+        public ActionResult ShowProfile(string username)
         {
             if (Session["WhitelistUntil"] != null && (DateTime)Session["WhitelistUntil"] < DateTime.Now)
                 Session["WhitelistUntil"] = null;
