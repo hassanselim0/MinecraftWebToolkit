@@ -1,0 +1,12 @@
+﻿@{ ViewBag.Title = "Server Properties"; }
+
+<h2>Server Properties</h2>
+
+@using (Html.BeginForm())
+{
+    <textarea name="props" style="width: 100%; height: 320px;">@Model</textarea>
+    <br />
+    <input type="submit" value="Save" />
+    @Html.ActionLink("Restore Backup", "RestoreProperties")
+}
+

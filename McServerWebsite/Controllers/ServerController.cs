@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -67,6 +68,35 @@ namespace McServerWebsite.Controllers
             if (prog == "Completed") Mapper.Progress = "";
 
             return Content(prog);
+        }
+
+        public ActionResult Properties()
+        {
+            var props = System.IO.File.ReadAllText(
+                ConfigurationManager.AppSettings["McServerPath"] + "server.properties");
+
+            return View((object)props);
+        }
+
+        [HttpPost]
+        public ActionResult Properties(string props)
+        {
+            var path = ConfigurationManager.AppSettings["McServerPath"];
+
+            System.IO.File.Move(path + "server.properties", path + "server.properties-backup");
+
+            System.IO.File.WriteAllText(path + "server.properties", props);
+
+            return RedirectToAction("Properties");
+        }
+
+        public ActionResult RestoreProperties()
+        {
+            var path = ConfigurationManager.AppSettings["McServerPath"];
+
+            System.IO.File.Copy(path + "server.properties-backup", path + "server.properties", true);
+
+            return RedirectToAction("Properties");
         }
     }
 }
