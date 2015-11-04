@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Caching;
 using System.Net;
 
-namespace McServerWebsite
+namespace MinecraftWebToolkit
 {
     public class KeepAlive
     {

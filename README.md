@@ -1,4 +1,4 @@
-# Minecraft Server Web Interface #
+# MCWTK: Minecraft Web Toolkit #
 
 ## What is this? ##
 This is an old project I started back in 2011, I wanted to play Minecraft with my friends but I wanted them to be able to start the server and play on it even if I'm not available, so I decided to make a web interface for minecraft_server.jar :)

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace McServerWebsite.Controllers
+namespace MinecraftWebToolkit.Controllers
 {
     [NoCache, Authorize(Roles = "Moderator")]
     public class ServerController : Controller

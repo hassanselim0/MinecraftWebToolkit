@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 
-namespace McServerWebsite
+namespace MinecraftWebToolkit
 {
     public class MinecraftServer
     {

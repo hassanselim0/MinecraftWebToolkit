@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
-namespace McServerWebsite
+namespace MinecraftWebToolkit
 {
     public class Mapper
     {

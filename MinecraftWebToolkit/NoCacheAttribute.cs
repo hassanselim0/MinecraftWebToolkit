@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace McServerWebsite
+namespace MinecraftWebToolkit
 {
     public class NoCacheAttribute : ActionFilterAttribute
     {

@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
-namespace McServerWebsite.Controllers
+namespace MinecraftWebToolkit.Controllers
 {
     [NoCache]
     [Authorize(Roles = "Admin")]
