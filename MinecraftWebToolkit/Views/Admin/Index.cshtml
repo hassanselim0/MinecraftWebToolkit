@@ -23,7 +23,7 @@
         function StartUpdate()
         {
             $.get('@Url.Action("UpdateServer")');
-            ChangeProgress();
+            $("#UpdateProgress").text("starting...");
             ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
         }
 
@@ -37,7 +37,7 @@
                 else
                     $("#UpdateProgress").text("(" + result + ")");
 
-                if (result == "Completed" || result == "")
+                if (result == "Completed" || result == "" || result.indexOf("Error") == 0)
                     clearInterval(ProgressIntervalHandle);
             });
         }
