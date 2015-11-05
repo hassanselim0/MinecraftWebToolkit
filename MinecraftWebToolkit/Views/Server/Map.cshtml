@@ -17,7 +17,8 @@
             function StartMapper()
             {
                 $.get('@Url.Action("StartMapper")');
-                ChangeProgress();
+                $("#MapperProgress").text("starting...");
+                $("#UpdateBtn").hide();
                 ProgressIntervalHandle = setInterval("ChangeProgress()", 4000);
             }
 
