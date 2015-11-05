@@ -13,11 +13,6 @@ namespace MinecraftWebToolkit.Controllers
     {
         public ActionResult Index()
         {
-            if (HttpContext.Application["UpdateProgress"] != null)
-                ViewData["ServerStatus"] = "Updating";
-            else
-                ViewData["ServerStatus"] = MvcApplication.McServer.IsRunning ? "Running" : "Stopped";
-
             return View();
         }
 
