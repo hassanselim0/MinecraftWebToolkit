@@ -16,29 +16,38 @@
         $(document).ready(function()
         {
             $.ajaxSetup({ cache: false });
+
             ChangeProgress();
             ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
         });
 
         function StartUpdate()
         {
-            $.get('@Url.Action("UpdateServer")');
-            $("#UpdateProgress").text("starting...");
+            $.get('@Url.Action("UpdateServer")?ver=' + $("#VersionList").val());
+
+            $("#UpdateProgress").text("(Starting...)");
             ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+
+            $("#VersionList").hide();
+            $("#UpdateBtn").hide();
         }
 
         function ChangeProgress()
         {
             $.get('@Url.Action("UpdateProgress")', function(result)
             {
-
                 if (result == "")
                     $("#UpdateProgress").text("");
                 else
                     $("#UpdateProgress").text("(" + result + ")");
 
                 if (result == "Completed" || result == "" || result.indexOf("Error") == 0)
+                {
                     clearInterval(ProgressIntervalHandle);
+
+                    $("#VersionList").show();
+                    $("#UpdateBtn").show();
+                }
             });
         }
     </script>
@@ -49,9 +58,12 @@
 Server Status: @Html.Action("ServerStatus", "Home")<br />
 <br />
 
-Server Admin Commands:<br />
 @Html.ActionLink("Kill Server", "KillServer")<br />
-<a href="#" onclick="StartUpdate(); return false;">Update Server</a>
+<br />
+
+Update Server:
+<select id="VersionList" style="display: none">@Html.Action("ServerVersions")</select>
+<button id="UpdateBtn" style="display: none" onclick="StartUpdate()">Update Server</button>
 <span id="UpdateProgress"></span><br />
 <br />
 

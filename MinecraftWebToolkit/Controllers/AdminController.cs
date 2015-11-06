@@ -70,7 +70,22 @@ namespace MinecraftWebToolkit.Controllers
             return RedirectToAction("");
         }
 
-        public ActionResult UpdateServer()
+        public ActionResult ServerVersions()
+        {
+            var client = new System.Net.WebClient();
+            client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable);
+
+            // Note: versions.json doesn't have Allow-Origin, so it can't be used on the client-side directly!
+            var jObj = JObject.Parse(client.DownloadString(
+                "https://s3.amazonaws.com/Minecraft.Download/versions/versions.json"));
+
+            var vers = jObj["versions"].Select(t => t["id"].Value<string>()).TakeWhile(v => v != "1.2.4");
+            vers = new[] { "Latest Stable", "Latest Snapshot" }.Union(vers);
+
+            return Content("<option>" + string.Join("</option><option>", vers) + "</option>");
+        }
+
+        public ActionResult UpdateServer(string ver)
         {
             // http://assets.minecraft.net/ <- This is an XML file
             // http://assets.minecraft.net/V_E_R/minecraft_server.jar
@@ -83,17 +98,21 @@ namespace MinecraftWebToolkit.Controllers
             var client = new System.Net.WebClient();
             client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable);
 
-            HttpContext.Application["UpdateProgress"] = "Getting Latest Version...";
+            HttpContext.Application["UpdateProgress"] = "Starting...";
 
             // Get Latest Version
-            var jObj = JObject.Parse(client.DownloadString(
-                "https://s3.amazonaws.com/Minecraft.Download/versions/versions.json"));
-            var ver = jObj["latest"]["release"].Value<string>();
+            if (ver.StartsWith("Latest"))
+            {
+                var jObj = JObject.Parse(client.DownloadString(
+                    "https://s3.amazonaws.com/Minecraft.Download/versions/versions.json"));
+                ver = jObj["latest"][ver.Split(' ')[1].ToLower()].Value<string>();
+            }
 
             var jarFile = "minecraft_server." + ver + ".jar";
             var jarUri = "https://s3.amazonaws.com/Minecraft.Download/versions/" + ver + "/" + jarFile;
 
             var config = WebConfigurationManager.OpenWebConfiguration("~");
+            var settings = config.AppSettings.Settings;
 
             client.DownloadProgressChanged += (o, e) =>
                 HttpContext.Application["UpdateProgress"] = e.ProgressPercentage + "%";
@@ -108,7 +127,7 @@ namespace MinecraftWebToolkit.Controllers
 
                 HttpContext.Application["UpdateProgress"] = "Completed";
 
-                config.AppSettings.Settings["McJarFile"].Value = jarFile;
+                settings["McJarFile"].Value = jarFile;
                 config.Save();
             };
 
@@ -117,8 +136,7 @@ namespace MinecraftWebToolkit.Controllers
             {
                 try
                 {
-                    client.DownloadFileAsync(new Uri(jarUri),
-                        config.AppSettings.Settings["McServerPath"].Value + jarFile);
+                    client.DownloadFileAsync(new Uri(jarUri), settings["McServerPath"].Value + jarFile);
                 }
                 catch (Exception ex)
                 {
