@@ -70,6 +70,13 @@ namespace MinecraftWebToolkit.Controllers
             return RedirectToAction("");
         }
 
+        public ActionResult SelectServerVersion(string jarFile)
+        {
+            WebConfigurationManager.AppSettings["McJarFile"] = jarFile;
+
+            return RedirectToAction("");
+        }
+
         public ActionResult ServerVersions()
         {
             var client = new System.Net.WebClient();

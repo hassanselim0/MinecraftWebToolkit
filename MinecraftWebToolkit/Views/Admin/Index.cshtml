@@ -67,11 +67,24 @@ Update Server:
 <span id="UpdateProgress"></span><br />
 <br />
 
+@using (Html.BeginForm("SelectServerVersion", "Admin"))
+{
+    @:Select Minecraft Server Version:
+    var currJar = WebConfigurationManager.AppSettings["McJarFile"];
+    var allJars = Directory.EnumerateFiles(WebConfigurationManager.AppSettings["McServerPath"], "*.jar")
+        .Select(f => Path.GetFileName(f));
+    // useless comment to avoid auto-formatting from screwing the indentation of the next line
+    @Html.DropDownList("jarFile", allJars.Select(f =>
+        new SelectListItem() { Text = f, Value = f, Selected = f == currJar }));
+    <input type="submit" value="Select" />
+}
+<br />
+
 @using (Html.BeginForm("SetPingIP", "Admin"))
 {
     @:Set Ping IP to Ignore:
     <input type="text" name="ip"
-           value="@System.Configuration.ConfigurationManager.AppSettings["AzurePingIP"]" />
+           value="@WebConfigurationManager.AppSettings["AzurePingIP"]" />
     <input type="submit" value="Set" />
 }
 <br />
