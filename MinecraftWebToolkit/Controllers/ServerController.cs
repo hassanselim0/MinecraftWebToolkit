@@ -17,32 +17,32 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult Start()
         {
-            MvcApplication.McServer.Start();
+            McServer.Inst.Start();
 
             return Content("OK " + DateTime.Now.Ticks);
         }
 
         public ActionResult SendCommand(string command)
         {
-            MvcApplication.McServer.SendCommand(command);
+            McServer.Inst.SendCommand(command);
 
             return Content("OK " + DateTime.Now.Ticks);
         }
 
         public ActionResult GetOutput(string since)
         {
-            if (MvcApplication.McServer.ConsoleHistory.Count == 0)
+            if (McServer.Inst.ConsoleHistory.Count == 0)
                 return Json(new { Output = "", LastMessage = 0 }, JsonRequestBehavior.AllowGet);
 
             int startAfter;
-            if (since == "") startAfter = MvcApplication.McServer.ConsoleHistory.Count - 101;
+            if (since == "") startAfter = McServer.Inst.ConsoleHistory.Count - 101;
             else startAfter = int.Parse(since);
 
             var result = new
             {
-                Output = MvcApplication.McServer.ConsoleHistory.SkipWhile((cm, i) => i <= startAfter)
+                Output = McServer.Inst.ConsoleHistory.SkipWhile((cm, i) => i <= startAfter)
                     .Aggregate("", (s1, s2) => s1 + HttpUtility.HtmlEncode(s2) + "<br />\r\n"),
-                LastMessage = MvcApplication.McServer.ConsoleHistory.Count - 1,
+                LastMessage = McServer.Inst.ConsoleHistory.Count - 1,
                 Ticks = DateTime.Now.Ticks,
             };
 

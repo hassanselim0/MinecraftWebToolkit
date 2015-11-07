@@ -37,8 +37,8 @@ namespace MinecraftWebToolkit.Controllers
         public ActionResult Logout()
         {
             var user = Membership.GetUser();
-            MvcApplication.McServer.UserIPs.Remove(user.UserName);
-            MvcApplication.McServer.UserLastPing.Remove(user.UserName);
+            McServer.Inst.UserIPs.Remove(user.UserName);
+            McServer.Inst.UserLastPing.Remove(user.UserName);
 
             FormsAuthentication.SignOut();
 
@@ -115,8 +115,8 @@ namespace MinecraftWebToolkit.Controllers
             {
                 username = Membership.GetUser().UserName;
 
-                MvcApplication.McServer.UserIPs[username] = Request.UserHostAddress;
-                MvcApplication.McServer.UserLastPing[username] = DateTime.UtcNow;
+                McServer.Inst.UserIPs[username] = Request.UserHostAddress;
+                McServer.Inst.UserLastPing[username] = DateTime.UtcNow;
             }
             else if (!Roles.IsUserInRole("Moderator")) // Prevent non-moderators from viewing other users
             {
@@ -140,14 +140,14 @@ namespace MinecraftWebToolkit.Controllers
                 return Redirect(FormsAuthentication.LoginUrl);
             }
 
-            MvcApplication.McServer.SendCommand("whitelist add " + username);
+            McServer.Inst.SendCommand("whitelist add " + username);
             if (username == null)
                 Session["WhitelistUntil"] = DateTime.Now.AddMinutes(2);
 
             new System.Threading.Thread(() =>
             {
                 System.Threading.Thread.Sleep(TimeSpan.FromMinutes(2));
-                MvcApplication.McServer.SendCommand("whitelist remove " + username);
+                McServer.Inst.SendCommand("whitelist remove " + username);
             }).Start();
 
             if (usr == null)

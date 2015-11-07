@@ -6,8 +6,11 @@ using System.Linq;
 
 namespace MinecraftWebToolkit
 {
-    public class MinecraftServer
+    public class McServer
     {
+        // Singleton ... yeah, I'm not a fan of them either!
+        public static McServer Inst { get; private set; }
+
         public List<ConsoleMessage> ConsoleHistory { get; private set; }
         public bool IsRunning { get; private set; }
         Process ServerProc;
@@ -15,7 +18,13 @@ namespace MinecraftWebToolkit
         public Dictionary<string, string> UserIPs { get; private set; }
         public Dictionary<string, DateTime> UserLastPing { get; private set; }
 
-        public MinecraftServer()
+        public static void Init()
+        {
+            if (Inst != null) throw new Exception("An instance already exists!");
+            Inst = new McServer();
+        }
+
+        private McServer()
         {
             var startInfo = new ProcessStartInfo(ConfigurationManager.AppSettings["JrePath"],
                 "-Xmx1024M -Xms512M -jar " + ConfigurationManager.AppSettings["McJarFile"] + " nogui");

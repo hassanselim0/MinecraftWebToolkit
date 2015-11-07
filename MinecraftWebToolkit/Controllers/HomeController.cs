@@ -26,7 +26,7 @@ namespace MinecraftWebToolkit.Controllers
 
             if (HttpContext.Application["UpdateProgress"] != null)
                 return Content("Updating");
-            else if (MvcApplication.McServer.IsRunning)
+            else if (McServer.Inst.IsRunning)
                 return Content("Online");
             else
                 return Content("Offline");
@@ -38,8 +38,8 @@ namespace MinecraftWebToolkit.Controllers
 
             if (string.IsNullOrEmpty(username)) return;
 
-            var userIPs = MvcApplication.McServer.UserIPs;
-            var userLastPing = MvcApplication.McServer.UserLastPing;
+            var userIPs = McServer.Inst.UserIPs;
+            var userLastPing = McServer.Inst.UserLastPing;
 
             if (userLastPing.ContainsKey(username) &&
                 DateTime.UtcNow.Subtract(userLastPing[username]).TotalMinutes < 1)

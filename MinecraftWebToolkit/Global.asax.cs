@@ -38,15 +38,7 @@ namespace MinecraftWebToolkit
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
 
-            Application["McServer"] = new MinecraftServer();
-        }
-
-        public static MinecraftServer McServer
-        {
-            get
-            {
-                return (MinecraftServer)HttpContext.Current.Application["McServer"];
-            }
+            McServer.Init();
         }
     }
 }

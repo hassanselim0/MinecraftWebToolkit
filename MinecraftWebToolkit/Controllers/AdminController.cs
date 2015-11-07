@@ -21,7 +21,7 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult KillServer()
         {
-            MvcApplication.McServer.Kill();
+            McServer.Inst.Kill();
 
             return RedirectToAction("");
         }
