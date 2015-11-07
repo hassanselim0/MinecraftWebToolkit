@@ -1,0 +1,76 @@
+﻿@{ ViewBag.Title = "Manage Worlds"; }
+
+@section HeadContent
+{
+    <style type="text/css">
+        table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td, th
+        {
+            text-align: center;
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        tr:nth-child(even)
+        {
+            background-color: #DDDDDD;
+        }
+    </style>
+    <script>
+        function ConfirmDelete(name)
+        {
+            if (confirm("Are you sure you want to delete:\r\n" + name))
+                window.location = '@Url.Action("DeleteWorldBackup")?name=' + name;
+
+            event.defaultPrevented = true;
+            event.returnValue = false;
+        }
+    </script>
+}
+
+<h2>World Backup</h2>
+
+Backup:<br />
+@using (Html.BeginForm("BackupWorld", "Admin"))
+{
+    <input type="text" name="name" placeholder="Backup Name"
+           value="World-@DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss-tt")" />
+    <input type="submit" value="Create Backup" />
+}
+
+Available Backups:<br />
+@if (Model.Count == 0)
+{
+    <div style="text-align: center; font-weight: bold;">No Backups Found!</div>
+}
+else
+{
+    <table>
+        <tr>
+            <th>File Name</th>
+            <th>Last Modified Date</th>
+            <th></th>
+        </tr>
+
+        @foreach (var backup in Model)
+        {
+            <tr>
+                <td>
+                    @backup.Item1
+                </td>
+                <td>
+                    @backup.Item2.ToString("yyyy-MM-dd hh:mm:ss tt")
+                </td>
+                <td>
+                    @Html.ActionLink("Restore", "RestoreWorld", new { name = backup.Item1 }) |
+                    <a href="#" onclick="ConfirmDelete('@backup.Item1')">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+}

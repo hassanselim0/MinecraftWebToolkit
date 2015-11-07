@@ -65,6 +65,9 @@ Server Status: @Html.Action("ServerStatus", "Home")<br />
 @Html.ActionLink("Kill Server", "KillServer")<br />
 <br />
 
+@Html.ActionLink("Manage Worlds", "ManageWorlds")<br />
+<br />
+
 Update Server:
 <select id="VersionList" style="display: none">@Html.Action("ServerVersions")</select>
 <button id="UpdateBtn" style="display: none" onclick="StartUpdate()">Update Server</button>

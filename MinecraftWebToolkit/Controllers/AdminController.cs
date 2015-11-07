@@ -1,12 +1,15 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Cache;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Security;
+using WebConfig = System.Web.Configuration.WebConfigurationManager;
 
 namespace MinecraftWebToolkit.Controllers
 {
@@ -28,10 +31,12 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult SetPingIP(string ip)
         {
-            System.Configuration.ConfigurationManager.AppSettings["AzurePingIP"] = ip;
+            WebConfig.AppSettings["AzurePingIP"] = ip;
 
             return RedirectToAction("");
         }
+
+        // User Management
 
         public ActionResult ApproveAccount(string username)
         {
@@ -70,9 +75,11 @@ namespace MinecraftWebToolkit.Controllers
             return RedirectToAction("");
         }
 
+        // MC Server JAR Management
+
         public ActionResult SelectServerVersion(string jarFile)
         {
-            WebConfigurationManager.AppSettings["McJarFile"] = jarFile;
+            WebConfig.AppSettings["McJarFile"] = jarFile;
 
             return RedirectToAction("");
         }
@@ -118,7 +125,7 @@ namespace MinecraftWebToolkit.Controllers
             var jarFile = "minecraft_server." + ver + ".jar";
             var jarUri = "https://s3.amazonaws.com/Minecraft.Download/versions/" + ver + "/" + jarFile;
 
-            var config = WebConfigurationManager.OpenWebConfiguration("~");
+            var config = WebConfig.OpenWebConfiguration("~");
             var settings = config.AppSettings.Settings;
 
             client.DownloadProgressChanged += (o, e) =>
@@ -164,6 +171,54 @@ namespace MinecraftWebToolkit.Controllers
                 HttpContext.Application["UpdateProgress"] = null;
 
             return Content(progress);
+        }
+
+        // MC World Management
+
+        public ActionResult ManageWorlds()
+        {
+            var backups = new DirectoryInfo(WebConfig.AppSettings["McServerPath"])
+                .EnumerateFiles("*.backup.zip")
+                .OrderByDescending(fi => fi.LastWriteTimeUtc)
+                .Select(fi => Tuple.Create(
+                    fi.Name.Replace(".backup.zip", ""),
+                    fi.LastWriteTimeUtc))
+                .ToList();
+
+            return View(backups);
+        }
+
+        public ActionResult BackupWorld(string name)
+        {
+            var serverPath = WebConfig.AppSettings["McServerPath"];
+
+            ZipFile.CreateFromDirectory(
+                Path.Combine(serverPath, "World"),
+                Path.Combine(serverPath, name + ".backup.zip"),
+                CompressionLevel.Fastest, includeBaseDirectory: false);
+
+            return RedirectToAction("ManageWorlds");
+        }
+
+        public ActionResult RestoreWorld(string name)
+        {
+            var serverPath = WebConfig.AppSettings["McServerPath"];
+
+            Directory.Delete(Path.Combine(serverPath, "World"), true);
+
+            ZipFile.ExtractToDirectory(
+                Path.Combine(serverPath, name + ".backup.zip"),
+                Path.Combine(serverPath, "World"));
+
+            return RedirectToAction("ManageWorlds");
+        }
+
+        public ActionResult DeleteWorldBackup(string name)
+        {
+            System.IO.File.Delete(
+                Path.Combine(WebConfig.AppSettings["McServerPath"], name + ".backup.zip"));
+
+            return RedirectToAction("ManageWorlds");
         }
     }
 }
