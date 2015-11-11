@@ -72,29 +72,22 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult Properties()
         {
-            var props = System.IO.File.ReadAllText(
-                ConfigurationManager.AppSettings["McServerPath"] + "server.properties");
-
-            return View((object)props);
+            return View(McProperties.GetAll());
         }
 
         [HttpPost]
-        public ActionResult Properties(string props)
+        public ActionResult Properties(List<McProperty> props)
         {
-            var path = ConfigurationManager.AppSettings["McServerPath"];
+            props.RemoveAll(p => string.IsNullOrEmpty(p.Name));
 
-            System.IO.File.Move(path + "server.properties", path + "server.properties-backup");
-
-            System.IO.File.WriteAllText(path + "server.properties", props);
+            McProperties.SetAll(props);
 
             return RedirectToAction("Properties");
         }
 
         public ActionResult RestoreProperties()
         {
-            var path = ConfigurationManager.AppSettings["McServerPath"];
-
-            System.IO.File.Copy(path + "server.properties-backup", path + "server.properties", true);
+            McProperties.RestoreBackup();
 
             return RedirectToAction("Properties");
         }

@@ -1,11 +1,63 @@
-﻿@{ ViewBag.Title = "Server Properties"; }
+﻿@model List<McProperty>
 
-<h2>Server Properties</h2>
+@{ ViewBag.Title = "Server Properties"; }
+
+@section HeadContent
+{
+    <style type="text/css">
+        tr td:first-child
+        {
+            text-align: right;
+        }
+    </style>
+    <script>
+        function AddProp()
+        {
+            var template = '<tr><td>@Html.TextBoxFor(m => m[0].Name)</td>'
+                + '<td>@Html.TextBoxFor(m => m[0].Value)</td>'
+                + '<td><button type="button" onclick="RemoveProp(0)">X</button></td></tr>';
+
+            var i = $("#PropTbl tr").length;
+            $("#PropTbl").append(template.replace(/0/g, i));
+            $("#PropTbl tr:last-child input").val("");
+        }
+
+        function RemoveProp(i)
+        {
+            $("#PropTbl tr")[i].remove();
+        }
+    </script>
+}
+
+<h2 style="margin-bottom: 2px">Server Properties</h2>
+
+<a href="http://minecraft.gamepedia.com/Server.properties#Minecraft_server_properties" target="_blank">
+    Wiki Page
+</a>
 
 @using (Html.BeginForm())
 {
-    <textarea name="props" style="width: 100%; height: 320px;">@Model</textarea>
+    <table id="PropTbl">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>
+                    @Model[i].Name
+                    @Html.HiddenFor(m => m[i].Name)
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m[i].Value)
+                </td>
+                <td>
+                    <button type="button" onclick="RemoveProp(@i)">X</button>
+                </td>
+            </tr>
+        }
+    </table>
+    <button type="button" onclick="AddProp()">Add</button><br />
+
     <br />
+
     <input type="submit" value="Save" />
     @Html.ActionLink("Restore Backup", "RestoreProperties")
 }

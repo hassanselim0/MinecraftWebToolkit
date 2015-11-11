@@ -123,6 +123,7 @@
     </Compile>
     <Compile Include="KeepAlive.cs" />
     <Compile Include="Mapper.cs" />
+    <Compile Include="McProperties.cs" />
     <Compile Include="McServer.cs" />
     <Compile Include="NoCacheAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
