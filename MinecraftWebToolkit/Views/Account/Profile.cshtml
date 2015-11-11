@@ -30,7 +30,7 @@
         <td>
             @{
                 string ip;
-                if (MvcApplication.McServer.UserIPs.TryGetValue(Model.UserName, out ip))
+                if (McServer.Inst.UserIPs.TryGetValue(Model.UserName, out ip))
                 {
                     @ip
                 }
