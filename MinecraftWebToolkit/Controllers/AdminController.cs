@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Security;
+using FileIO = System.IO.File;
 using WebConfig = System.Web.Configuration.WebConfigurationManager;
 
 namespace MinecraftWebToolkit.Controllers
@@ -177,46 +178,98 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult ManageWorlds()
         {
-            var backups = new DirectoryInfo(WebConfig.AppSettings["McServerPath"])
-                .EnumerateFiles("*.backup.zip")
+            var serverPath = WebConfig.AppSettings["McServerPath"];
+            var backupsDir = Path.Combine(serverPath, "Backups");
+
+            if (!Directory.Exists(backupsDir))
+                Directory.CreateDirectory(backupsDir);
+
+            ViewBag.Backups =
+                new DirectoryInfo(backupsDir)
+                .EnumerateFiles("*.zip")
                 .OrderByDescending(fi => fi.LastWriteTimeUtc)
-                .Select(fi => Tuple.Create(
-                    fi.Name.Replace(".backup.zip", ""),
-                    fi.LastWriteTimeUtc))
+                .Select(fi =>
+                {
+                    var s = fi.Name.Split('.');
+                    return Tuple.Create(s[0],
+                        DateTime.ParseExact(s[1], "yyyy-MM-dd-hh-mm-ss-tt", null));
+                })
                 .ToList();
 
-            return View(backups);
+            ViewBag.Worlds =
+                Directory.EnumerateFiles(serverPath, "level.dat", SearchOption.AllDirectories)
+                .Select(f => Path.GetFileName(f.Replace("\\level.dat", "")))
+                .ToList();
+
+            ViewBag.SelWorld = McProperties.GetValue("level-name");
+
+            return View();
         }
 
-        public ActionResult BackupWorld(string name)
+        public ActionResult CreateWorld(string world)
+        {
+            world = world.Replace('.', '_'); // Can't have dots!
+
+            var worldPath = Path.Combine(WebConfig.AppSettings["McServerPath"], world);
+
+            Directory.CreateDirectory(worldPath);
+            FileIO.WriteAllText(Path.Combine(worldPath, "level.dat"), "");
+            // Minecraft Server will show an error for the first time then create a new random world
+
+            return RedirectToAction("ManageWorlds");
+        }
+
+        public ActionResult SelectWorld(string world)
+        {
+            McProperties.SetValue("level-name", world);
+
+            return RedirectToAction("ManageWorlds");
+        }
+
+        public ActionResult DeleteWorld(string world)
+        {
+            Directory.Delete(Path.Combine(WebConfig.AppSettings["McServerPath"], world), true);
+
+            return RedirectToAction("ManageWorlds");
+        }
+
+        public ActionResult BackupWorld(string world)
         {
             var serverPath = WebConfig.AppSettings["McServerPath"];
+            var zipName = world + DateTime.UtcNow.ToString(".yyyy-MM-dd-hh-mm-ss-tt") + ".zip";
 
             ZipFile.CreateFromDirectory(
-                Path.Combine(serverPath, "World"),
-                Path.Combine(serverPath, name + ".backup.zip"),
+                Path.Combine(serverPath, world),
+                Path.Combine(serverPath, "Backups", zipName),
                 CompressionLevel.Fastest, includeBaseDirectory: false);
 
             return RedirectToAction("ManageWorlds");
         }
 
-        public ActionResult RestoreWorld(string name)
+        public ActionResult RestoreWorld(string world, DateTime date)
         {
             var serverPath = WebConfig.AppSettings["McServerPath"];
+            var zipName = world + date.ToString(".yyyy-MM-dd-hh-mm-ss-tt") + ".zip";
+            var worldPath = Path.Combine(serverPath, world);
 
-            Directory.Delete(Path.Combine(serverPath, "World"), true);
+            // Temporarily move the existing world folder
+            if (Directory.Exists(worldPath))
+                Directory.Move(worldPath, worldPath + "-temp");
 
             ZipFile.ExtractToDirectory(
-                Path.Combine(serverPath, name + ".backup.zip"),
-                Path.Combine(serverPath, "World"));
+                Path.Combine(serverPath, "Backups", zipName), worldPath);
+
+            // Delete the old world folder
+            if (Directory.Exists(worldPath + "-temp"))
+                Directory.Delete(worldPath + "-temp", true);
 
             return RedirectToAction("ManageWorlds");
         }
 
-        public ActionResult DeleteWorldBackup(string name)
+        public ActionResult DeleteWorldBackup(string world, DateTime date)
         {
-            System.IO.File.Delete(
-                Path.Combine(WebConfig.AppSettings["McServerPath"], name + ".backup.zip"));
+            FileIO.Delete(Path.Combine(WebConfig.AppSettings["McServerPath"], "Backups",
+                world + date.ToString(".yyyy-MM-dd-hh-mm-ss-tt") + ".zip"));
 
             return RedirectToAction("ManageWorlds");
         }

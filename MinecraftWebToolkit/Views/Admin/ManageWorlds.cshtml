@@ -5,13 +5,13 @@
     <style type="text/css">
         table
         {
-            width: 100%;
             border-collapse: collapse;
         }
 
         td, th
         {
             text-align: center;
+            padding: 2px 16px;
             border-width: 1px;
             border-style: solid;
         }
@@ -22,10 +22,19 @@
         }
     </style>
     <script>
-        function ConfirmDelete(name)
+        function ConfirmDeleteWorld(world)
         {
-            if (confirm("Are you sure you want to delete:\r\n" + name))
-                window.location = '@Url.Action("DeleteWorldBackup")?name=' + name;
+            if (confirm("Are you sure you want to delete the world:\r\n" + world))
+                window.location = '@Url.Action("DeleteWorld")?world=' + world;
+
+            event.defaultPrevented = true;
+            event.returnValue = false;
+        }
+
+        function ConfirmDeleteBackup(world, date)
+        {
+            if (confirm("Are you sure you want to delete the backup for:\r\n" + world))
+                window.location = '@Url.Action("DeleteWorldBackup")?world=' + world + '&date=' + date;
 
             event.defaultPrevented = true;
             event.returnValue = false;
@@ -33,18 +42,60 @@
     </script>
 }
 
-<h2>World Backup</h2>
+<h2>World Manager</h2>
 
-Backup:<br />
-@using (Html.BeginForm("BackupWorld", "Admin"))
+@using (Html.BeginForm("CreateWorld", "Admin"))
 {
-    <input type="text" name="name" placeholder="Backup Name"
-           value="World-@DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss-tt")" />
-    <input type="submit" value="Create Backup" />
+    @:New World:
+    <input type="text" name="world" placeholder="A Whole New Woooorld!" />
+    <input type="submit" value="Create" />
 }
 
-Available Backups:<br />
-@if (Model.Count == 0)
+<br />
+
+Worlds:<br />
+@if (ViewBag.Worlds.Count == 0)
+{
+    <div style="text-align: center; font-weight: bold;">No Worlds Found!</div>
+}
+else
+{
+    <table>
+        <tr>
+            <th>World Name</th>
+            <th>Selected?</th>
+            <th></th>
+        </tr>
+
+        @foreach (var world in ViewBag.Worlds)
+        {
+            <tr>
+                <td>
+                    @world
+                </td>
+                <td>
+                    @if (ViewBag.SelWorld == world)
+                    {
+                        @:✔
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Select", "SelectWorld", new { world = world })
+                    }
+                </td>
+                <td>
+                    @Html.ActionLink("Backup", "BackupWorld", new { world = world }) |
+                    <a href="#" onclick="ConfirmDeleteWorld('@world')">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+}
+
+<br />
+
+Backups:<br />
+@if (ViewBag.Backups.Count == 0)
 {
     <div style="text-align: center; font-weight: bold;">No Backups Found!</div>
 }
@@ -52,23 +103,25 @@ else
 {
     <table>
         <tr>
-            <th>File Name</th>
-            <th>Last Modified Date</th>
+            <th>World Name</th>
+            <th>Backup Date</th>
             <th></th>
         </tr>
 
-        @foreach (var backup in Model)
+        @foreach (var backup in ViewBag.Backups)
         {
             <tr>
                 <td>
                     @backup.Item1
                 </td>
                 <td>
-                    @backup.Item2.ToString("yyyy-MM-dd hh:mm:ss tt")
+                    @backup.Item2.ToLongDateString() -
+                    @backup.Item2.ToLongTimeString()
                 </td>
                 <td>
-                    @Html.ActionLink("Restore", "RestoreWorld", new { name = backup.Item1 }) |
-                    <a href="#" onclick="ConfirmDelete('@backup.Item1')">Delete</a>
+                    @Html.ActionLink("Restore", "RestoreWorld",
+                        new { world = backup.Item1, date = backup.Item2 }) |
+                    <a href="#" onclick="ConfirmDeleteBackup('@backup.Item1','@backup.Item2')">Delete</a>
                 </td>
             </tr>
         }
