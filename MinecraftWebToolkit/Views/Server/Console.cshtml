@@ -35,7 +35,10 @@
         function sendCommand(command)
         {
             if (command == undefined) command = commandField.value;
+            if (command == "") return;
+
             $.get('@Url.Action("SendCommand", "Server")?command=' + command, setTimeout('refresh()', 100));
+
             commandField.value = '';
         }
 
@@ -47,8 +50,8 @@
 
         function commandKeyDown(e)
         {
-            if ((e.key == "Enter" || e.keyIdentifier == "Enter") && commandField.value != "")
-                sendCommand(commandField.value);
+            if (e.key == "Enter" || e.keyIdentifier == "Enter")
+                sendCommand();
         }
     </script>
 }
@@ -62,12 +65,15 @@
             <button onclick="startServer()">Start Server</button>
             <button onclick="sendCommand('stop')">Stop Server</button>
             @Html.ActionLink("Change Properties", "Properties")
+            <a href="http://minecraft.gamepedia.com/Commands#Summary_of_commands" target="_blank"
+               style="float:right; margin:8px 2px 0px 0px;">Wiki Page</a>
         </td>
     </tr>
     <tr>
         <td>
-            <input id="commandField" type="text" style="width: 86%" onkeydown="commandKeyDown(event)" />
-            <input type="button" value="Send" onclick="sendCommand()" style="width: 10%; float: right" />
+            <input id="commandField" type="text" style="width: 88%" onkeydown="commandKeyDown(event)" />
+            <input type="button" value="Send" onclick="sendCommand()"
+                   style="width: calc(12% - 12px); float: right" />
         </td>
     </tr>
     <tr>
