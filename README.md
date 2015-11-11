@@ -1,14 +1,23 @@
 # MCWTK: Minecraft Web Toolkit #
 
 ## What is this? ##
-This is an old project I started back in 2011, I wanted to play Minecraft with my friends but I wanted them to be able to start the server and play on it even if I'm not available, so I decided to make a web interface for minecraft_server.jar :)
+This is an old project I started back in 2011, I wanted to play Minecraft with my friends but I wanted them to be able to start the server and play on it even if I'm not available, so I decided to make a web interface for the Minecraft Server :)
 
-Since I'm a .Net guy, I decided to make this using ASP.NET MVC (I think it was version 2 at that time), that's why you'll notice that the project structure looks like the old templates even though I'm referencing MVC 5 now :D
+Since I'm a .Net guy, I decided to make this using ASP.NET MVC, I think it was version 2 at that time, that's why you'll notice that the project structure looks like the old templates even though I'm referencing MVC 5 now :D
 
-A lot of the code is hard-coded to my use-case, but I hope I could make it more and more flexible and modular over time. I also hope to separate the C# code that communicates with the server (MinecraftServer.cs) from the web app and turn it into a tiny REST service of some sort.
+A some of the code is hard-coded to my use-case, but I hope I could make it more and more flexible and modular over time. I also hope to separate the C# code that communicates with the server (MinecraftServer.cs) from the web app and turn it into a tiny REST service of some sort, so that I don't have to mess with the web application life cycle.
+
+## Features ##
+- Control Minecraft Server (start, stop, send commands, and see output)
+- Update and Show server map (using Overviewer)
+- Download any Minecraft Server Jar version (stable or preview) and switch between them
+- Edit server.properties file
+- Manage Multiple Worlds (including Backup and Restore)
+- Assign "Admin" and "Moderator" roles for users, this gives them access to the various parts of the web app
+- An alternate authentication system for the Minecraft Server that works with online-mode=false
 
 ## How can I deploy this? ##
-First you'll need a SQL Server Database (LocalDB is fine), change the connection string "DefaultConnection" in Web.config accordingly. I didn't try SQL Compact but it *should* work.
+First you'll need an SQL Server Database (LocalDB is fine), change the connection string "DefaultConnection" in Web.config accordingly. I didn't try SQL Compact but it *should* work, I think.
 
 Next you'll need IIS, a very important note here is that the application pool should only have 1 worker thread otherwise you would accidentally run two instances of the minecraft server! To do this select the application pool then click on advanced settings, under "Process Model" you'll find "Maximum Worker Processes", set this to 1.
 
@@ -32,7 +41,7 @@ The code for that functionality is in /Mapper.cs and /Views/Server/Map.cshtml
 Ok I'll be honest here, I had friends who wanted to try playing the game with me before they could buy it.  
 This means I need to set online-mode=false in server.properties, this means the server wont authenticate the players against Mojang's servers, so players who don't have an Mojang account (or do but haven't bought the game) could enter the server. This has a disadvantage though, which is that players could impersonate other players easily, so to counter this I made an elaborate authentication system that's quite amusing.
 
-I wanted a way to make the Minecraft server use the authentication that happens on the website without having to make a server mod. I noticed that when I user attempts to join the server I get in the console his username and IP address, so I decided to make the website record the IP address of logged in users, then I wrote code to detect the player login console message and parse it, then I check if that user is currently logged in and has the same IP Address then he's allowed, otherwise a kick command is send with a message asking the user to login to the website.
+I wanted a way to make the Minecraft server use the authentication that happens on the website without having to make a server mod. I noticed that when a user attempts to join the server I get in the console his username and IP address. So I decided to make the website record the IP address of logged in users, then I wrote code to detect the player login console message and parse it, then I check if that user is currently logged in and has the same IP Address then he's allowed, otherwise a kick command is send with a message asking the user to login to the website.
 
 This might seem like a pointless feature to most people, and not very secure (since two players in the same local network could still impersonate each other), so you can easily disable this feature by commenting the relevant code in /MinecraftServer.cs, it's the if condition with `e.Data.Contains("logged in")`
 
