@@ -80,7 +80,9 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult SelectServerVersion(string jarFile)
         {
-            WebConfig.AppSettings["McJarFile"] = jarFile;
+            var config = WebConfig.OpenWebConfiguration("~");
+            config.AppSettings.Settings["McJarFile"].Value = jarFile;
+            config.Save();
 
             return RedirectToAction("");
         }
