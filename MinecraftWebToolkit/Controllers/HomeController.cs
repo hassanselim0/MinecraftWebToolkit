@@ -22,35 +22,14 @@ namespace MinecraftWebToolkit.Controllers
         [NoCache]
         public ActionResult ServerStatus()
         {
-            userPing();
+            McAuthHttpClient.Renew(User.Identity.Name, Request.UserHostAddress);
 
             if (HttpContext.Application["UpdateProgress"] != null)
                 return Content("Updating");
-            else if (McServer.Inst.IsRunning)
+            else if (ProcHttpClient.IsRunning("McServer"))
                 return Content("Online");
             else
                 return Content("Offline");
-        }
-
-        private void userPing()
-        {
-            var username = User.Identity.Name;
-
-            if (string.IsNullOrEmpty(username)) return;
-
-            var userIPs = McServer.Inst.UserIPs;
-            var userLastPing = McServer.Inst.UserLastPing;
-
-            if (userLastPing.ContainsKey(username) &&
-                DateTime.UtcNow.Subtract(userLastPing[username]).TotalMinutes < 1)
-                return;
-
-            var user = System.Web.Security.Membership.GetUser(username);
-            if (user != null && user.IsApproved)
-            {
-                userIPs[user.UserName] = Request.UserHostAddress;
-                userLastPing[user.UserName] = DateTime.UtcNow;
-            }
         }
     }
 }

@@ -87,15 +87,6 @@ Update Server:
 }
 <br />
 
-@using (Html.BeginForm("SetPingIP", "Admin"))
-{
-    @:Set Ping IP to Ignore:
-    <input type="text" name="ip"
-           value="@WebConfigurationManager.AppSettings["AzurePingIP"]" />
-    <input type="submit" value="Set" />
-}
-<br />
-
 @using (Html.BeginForm("ApproveAccount", "Admin"))
 {
     @:Approve User:

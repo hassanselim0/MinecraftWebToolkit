@@ -3,7 +3,7 @@
 @section HeadContent
 {
     <script type="text/javascript">
-        var LastMessage = '';
+        var LastTimestamp = "";
         var ConsoleIntervalHandle;
 
         $(document).ready(function()
@@ -21,9 +21,9 @@
 
         function refresh()
         {
-            $.getJSON('@Url.Action("GetOutput", "Server")?since=' + LastMessage, function(obj)
+            $.getJSON('@Url.Action("GetOutput", "Server")?since=' + LastTimestamp, function(obj)
             {
-                LastMessage = obj.LastMessage;
+                LastTimestamp = obj.LastTimestamp;
                 if (obj.Output != "")
                 {
                     ServerOutput.innerHTML += obj.Output;

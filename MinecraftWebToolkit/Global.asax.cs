@@ -37,8 +37,6 @@ namespace MinecraftWebToolkit
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
-
-            McServer.Init();
         }
     }
 }

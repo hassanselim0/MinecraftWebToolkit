@@ -25,14 +25,7 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult KillServer()
         {
-            McServer.Inst.Kill();
-
-            return RedirectToAction("");
-        }
-
-        public ActionResult SetPingIP(string ip)
-        {
-            WebConfig.AppSettings["AzurePingIP"] = ip;
+            ProcHttpClient.Kill("McServer");
 
             return RedirectToAction("");
         }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using WebConfig = System.Web.Configuration.WebConfigurationManager;
 
 namespace MinecraftWebToolkit.Controllers
 {
@@ -17,32 +19,32 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult Start()
         {
-            McServer.Inst.Start();
+            ProcHttpClient.StartProc("McServer", WebConfig.AppSettings["JrePath"],
+                "-Xmx1024M -Xms512M -jar " + WebConfig.AppSettings["McJarFile"] + " nogui",
+                WebConfig.AppSettings["McServerPath"]);
 
             return Content("OK " + DateTime.Now.Ticks);
         }
 
         public ActionResult SendCommand(string command)
         {
-            McServer.Inst.SendCommand(command);
+            ProcHttpClient.WriteLine("McServer", command);
 
             return Content("OK " + DateTime.Now.Ticks);
         }
 
-        public ActionResult GetOutput(string since)
+        public ActionResult GetOutput(long since = 0)
         {
-            if (McServer.Inst.ConsoleHistory.Count == 0)
-                return Json(new { Output = "", LastMessage = 0 }, JsonRequestBehavior.AllowGet);
+            var log = ProcHttpClient.GetLog("McServer", since)
+                .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Split(new[] { '|' }, 2));
 
-            int startAfter;
-            if (since == "") startAfter = McServer.Inst.ConsoleHistory.Count - 101;
-            else startAfter = int.Parse(since);
+            var lastTimestamp = log.Last()[0];
 
             var result = new
             {
-                Output = McServer.Inst.ConsoleHistory.SkipWhile((cm, i) => i <= startAfter)
-                    .Aggregate("", (s1, s2) => s1 + HttpUtility.HtmlEncode(s2) + "<br />\r\n"),
-                LastMessage = McServer.Inst.ConsoleHistory.Count - 1,
+                Output = log.Aggregate("", (s1, s2) => s1 + HttpUtility.HtmlEncode(s2[1]) + "<br />\r\n"),
+                LastTimestamp = lastTimestamp,
                 Ticks = DateTime.Now.Ticks,
             };
 
@@ -57,17 +59,36 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult StartMapper()
         {
-            Mapper.Start();
+            ProcHttpClient.StartProc("Mapper",
+                Path.Combine(WebConfig.AppSettings["McServerPath"] + "Overviewer\\overviewer.exe"),
+                "-p 4 --rendermodes=smooth_lighting,smooth_night \""
+                + McProperties.GetValue("level-name") + "\" \"Map\"",
+                WebConfig.AppSettings["McServerPath"]);
 
             return Content("OK " + DateTime.Now.Ticks);
         }
 
         public ActionResult MapperProgress()
         {
-            var prog = Mapper.Progress;
-            if (prog == "Completed") Mapper.Progress = "";
+            var log = ProcHttpClient.GetLog("Mapper", 0)
+                .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Split(new[] { '|' }, 2));
 
-            return Content(prog);
+            if (!log.Any())
+                return Content("");
+
+            if (log.Last()[1] == "Process Ended!")
+            {
+                ProcHttpClient.ClearLog("Mapper");
+                return Content("Completed");
+            }
+
+            var lastProg = log.LastOrDefault(s => s[1].Contains("% complete"));
+
+            if (lastProg == null)
+                return Content("0%");
+
+            return Content(lastProg[1].Split(' ')[8]);
         }
 
         public ActionResult Properties()

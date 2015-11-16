@@ -24,6 +24,8 @@ namespace MinecraftWebToolkit.Controllers
             {
                 FormsAuthentication.SetAuthCookie(username, true);
 
+                McAuthHttpClient.Renew(username, Request.UserHostAddress);
+
                 if (!String.IsNullOrEmpty(returnUrl)) return Redirect(returnUrl);
 
                 return RedirectToAction("Profile");
@@ -36,9 +38,7 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult Logout()
         {
-            var user = Membership.GetUser();
-            McServer.Inst.UserIPs.Remove(user.UserName);
-            McServer.Inst.UserLastPing.Remove(user.UserName);
+            McAuthHttpClient.Revoke(User.Identity.Name);
 
             FormsAuthentication.SignOut();
 
@@ -114,9 +114,6 @@ namespace MinecraftWebToolkit.Controllers
             if (username == null)
             {
                 username = Membership.GetUser().UserName;
-
-                McServer.Inst.UserIPs[username] = Request.UserHostAddress;
-                McServer.Inst.UserLastPing[username] = DateTime.UtcNow;
             }
             else if (!Roles.IsUserInRole("Moderator")) // Prevent non-moderators from viewing other users
             {
@@ -127,33 +124,33 @@ namespace MinecraftWebToolkit.Controllers
             return View(Membership.GetUser(username));
         }
 
-        [Authorize]
-        public ActionResult Whitelist(string username)
-        {
-            var usr = username;
+        //[Authorize]
+        //public ActionResult Whitelist(string username)
+        //{
+        //    var usr = username;
 
-            if (username == null)
-                username = Membership.GetUser().UserName;
-            else if (!Roles.IsUserInRole("Moderator")) // Prevent non-moderators from White-listing other users
-            {
-                FormsAuthentication.RedirectToLoginPage();
-                return Redirect(FormsAuthentication.LoginUrl);
-            }
+        //    if (username == null)
+        //        username = Membership.GetUser().UserName;
+        //    else if (!Roles.IsUserInRole("Moderator")) // Prevent non-moderators from White-listing other users
+        //    {
+        //        FormsAuthentication.RedirectToLoginPage();
+        //        return Redirect(FormsAuthentication.LoginUrl);
+        //    }
 
-            McServer.Inst.SendCommand("whitelist add " + username);
-            if (username == null)
-                Session["WhitelistUntil"] = DateTime.Now.AddMinutes(2);
+        //    McServer.Inst.SendCommand("whitelist add " + username);
+        //    if (username == null)
+        //        Session["WhitelistUntil"] = DateTime.Now.AddMinutes(2);
 
-            new System.Threading.Thread(() =>
-            {
-                System.Threading.Thread.Sleep(TimeSpan.FromMinutes(2));
-                McServer.Inst.SendCommand("whitelist remove " + username);
-            }).Start();
+        //    new System.Threading.Thread(() =>
+        //    {
+        //        System.Threading.Thread.Sleep(TimeSpan.FromMinutes(2));
+        //        McServer.Inst.SendCommand("whitelist remove " + username);
+        //    }).Start();
 
-            if (usr == null)
-                return RedirectToAction("Profile");
+        //    if (usr == null)
+        //        return RedirectToAction("Profile");
 
-            return RedirectToAction("Profile", new { username = username });
-        }
+        //    return RedirectToAction("Profile", new { username = username });
+        //}
     }
 }
