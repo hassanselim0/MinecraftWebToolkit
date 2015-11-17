@@ -71,10 +71,10 @@ namespace MinecraftWebToolkit
                 "/ClearLog/{0}", name));
         }
 
-        public static void Kill(string name)
+        public static void KillProc(string name)
         {
             DoAction(string.Format(
-                "/Kill/{0}", name));
+                "/KillProc/{0}", name));
         }
     }
 

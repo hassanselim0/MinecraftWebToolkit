@@ -68,7 +68,7 @@ namespace HttpProcessWrapper
                 return 200;
             };
 
-            Get["/Kill/{name}"] = p =>
+            Get["/KillProc/{name}"] = p =>
             {
                 Procs[p.name].Kill();
 
