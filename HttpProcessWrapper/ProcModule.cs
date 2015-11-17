@@ -74,6 +74,14 @@ namespace HttpProcessWrapper
 
                 return 200;
             };
+
+            Get["/Close"] = _ =>
+            {
+                KillAllProcs();
+                Environment.Exit(0);
+
+                return 200;
+            };
         }
 
         public static void KillAllProcs()
