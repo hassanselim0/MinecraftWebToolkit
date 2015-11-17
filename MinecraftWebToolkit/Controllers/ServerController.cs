@@ -52,18 +52,30 @@ namespace MinecraftWebToolkit.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Map()
+        public ActionResult Map(string world)
         {
+            var serverPath = WebConfig.AppSettings["McServerPath"];
+
+            ViewBag.Worlds =
+                Directory.EnumerateFiles(serverPath, "level.dat", SearchOption.AllDirectories)
+                .Select(f => Path.GetFileName(f.Replace("\\level.dat", "")))
+                .ToList();
+
+            ViewBag.SelWorld = world ?? McProperties.GetValue("level-name");
+
             return View();
         }
 
-        public ActionResult StartMapper()
+        public ActionResult StartMapper(string world)
         {
+            var serverPath = WebConfig.AppSettings["McServerPath"];
+            if (world == null) world = McProperties.GetValue("level-name");
+
             ProcHttpClient.StartProc("Mapper",
-                Path.Combine(WebConfig.AppSettings["McServerPath"] + "Overviewer\\overviewer.exe"),
+                Path.Combine(serverPath, "Overviewer\\overviewer.exe"),
                 "-p 4 --rendermodes=smooth_lighting,smooth_night \""
-                + McProperties.GetValue("level-name") + "\" \"Map\"",
-                WebConfig.AppSettings["McServerPath"]);
+                + world + "\" \"" + Path.Combine("Map", world) + "\"",
+                serverPath);
 
             return Content("OK " + DateTime.Now.Ticks);
         }
