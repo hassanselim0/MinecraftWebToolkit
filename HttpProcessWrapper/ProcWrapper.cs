@@ -43,16 +43,15 @@ namespace HttpProcessWrapper
 
             proc.Start();
             proc.BeginOutputReadLine();
+
+            addToLog("Process Started!");
         }
 
         protected virtual void proc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data == null) return;
 
-            if (outputLog.Count == maxLogSize)
-                outputLog.Dequeue();
-
-            outputLog.Enqueue(new ConsoleOutput(e.Data));
+            addToLog(e.Data);
         }
 
         protected virtual void proc_Exited(object sender, EventArgs e)
@@ -62,10 +61,15 @@ namespace HttpProcessWrapper
             proc.CancelOutputRead();
             proc.Close();
 
+            addToLog("Process Ended!");
+        }
+
+        private void addToLog(string str)
+        {
             if (outputLog.Count == maxLogSize)
                 outputLog.Dequeue();
 
-            outputLog.Enqueue(new ConsoleOutput("Process Ended!"));
+            outputLog.Enqueue(new ConsoleOutput(str));
         }
 
         public string GetLog(long since, string sep)
