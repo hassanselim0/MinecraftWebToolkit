@@ -5,7 +5,7 @@ This is an old project I started back in 2011, I wanted to play Minecraft with m
 
 Since I'm a .Net guy, I decided to make this using ASP.NET MVC, I think it was version 2 at that time, that's why you'll notice that the project structure looks like the old templates even though I'm referencing MVC 5 now :D
 
-A some of the code is hard-coded to my use-case, but I hope I could make it more flexible and modular over time.
+Some of the code is hard-coded to my use-case, but I hope I could make it more flexible and modular over time.
 
 ## Features ##
 - Control Minecraft Server (start, stop, send commands, and see output)
@@ -15,7 +15,6 @@ A some of the code is hard-coded to my use-case, but I hope I could make it more
 - Manage Multiple Worlds (including Backup and Restore)
 - Assign "Admin" and "Moderator" roles for users, this gives them access to the various parts of the web app
 - An alternate authentication system for the Minecraft Server that works with online-mode=false
-
 - ... and HttpProcessWrapper, a general-purpose Web Service for managing and communicating with console apps via a REST API
 
 ## How can I deploy this? ##

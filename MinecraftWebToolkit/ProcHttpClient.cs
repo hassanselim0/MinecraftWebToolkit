@@ -17,7 +17,7 @@ namespace MinecraftWebToolkit
             http.BaseAddress = new Uri("http://localhost:25564");
 
             if (Process.GetProcessesByName("HttpProcessWrapper").Length == 0)
-                Process.Start(HttpContext.Current.Server.MapPath(@"~\bin\HPW\HttpProcessWrapper.exe"));
+                Process.Start(HttpContext.Current.Server.MapPath(@"~\bin\HttpProcessWrapper.exe"));
         }
 
         public static void DoAction(string uri)
