@@ -15,7 +15,7 @@ Some of the code is hard-coded to my use-case, but I hope I could make it more f
 - Manage Multiple Worlds (including Backup and Restore)
 - Assign "Admin" and "Moderator" roles for users, this gives them access to the various parts of the web app
 - An alternate authentication system for the Minecraft Server that works with online-mode=false
-- ... and HttpProcessWrapper, a general-purpose Web Service for managing and communicating with console apps via a REST API
+- ... and HttpProcessWrapper, a general-purpose light-weight Web Service for managing and communicating with console apps via a REST API
 
 ## How can I deploy this? ##
 First you'll need an SQL Server Database (LocalDB is fine), change the connection string "DefaultConnection" in Web.config accordingly. I didn't try SQL Compact but it *should* work, I think.
@@ -25,6 +25,8 @@ Next you'll need IIS, just create an application and deploy to it (I use IIS Web
 Of course make sure Java 6 or 7 or 8 (JRE or JDK) is installed, you can change the "JrePath" value in Web.config to the path of the JRE version you want to use or just leave it as "java" to use the on in your PATH environment variable.
 
 Finally, in Web.config change the value of "McServerPath" to the folder where the server jar exists, and change the value of "McJarFile" to the exact file name of the jar file (eg: minecraft_server.1.8.8.jar).
+
+After successfully running the web app for the first time, create a new user account, then login using "admin" and "admin123", the go to the Admin Page and add that new account to the "Moderator" and "Admin" roles, then delete the default "admin" account. Alternatively you could just change the password of the default "admin" account from the Profile page, but obviously that would be less secure!
 
 If you plan on putting this on Azure, then you need an "A2 Basic" VM or better, it could work on an "A1 Basic" but it can get laggy, and nobody wants to lag next to a creeper :D
 
