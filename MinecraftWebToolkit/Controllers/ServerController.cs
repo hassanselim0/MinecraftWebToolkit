@@ -71,6 +71,10 @@ namespace MinecraftWebToolkit.Controllers
             var serverPath = WebConfig.AppSettings["McServerPath"];
             if (world == null) world = McProperties.GetValue("level-name");
 
+            var mapsDir = Path.Combine(serverPath, "Map");
+            if (!Directory.Exists(mapsDir))
+                Directory.CreateDirectory(mapsDir);
+
             ProcHttpClient.StartProc("Mapper",
                 Path.Combine(serverPath, "Overviewer\\overviewer.exe"),
                 "-p 4 --rendermodes=smooth_lighting,smooth_night \""
