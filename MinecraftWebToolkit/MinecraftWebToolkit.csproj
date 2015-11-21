@@ -26,6 +26,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -128,6 +129,30 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\HttpProcessWrapper\bin\Debug\HttpProcessWrapper.exe">
+      <Link>HPW\HttpProcessWrapper.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\HttpProcessWrapper\bin\Debug\HttpProcessWrapper.pdb">
+      <Link>HPW\HttpProcessWrapper.pdb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\HttpProcessWrapper\bin\Debug\Nancy.dll">
+      <Link>HPW\Nancy.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\HttpProcessWrapper\bin\Debug\Nancy.Hosting.Self.dll">
+      <Link>HPW\Nancy.Hosting.Self.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\HttpProcessWrapper\bin\Debug\Nancy.Hosting.Self.xml">
+      <Link>HPW\Nancy.Hosting.Self.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\HttpProcessWrapper\bin\Debug\Nancy.xml">
+      <Link>HPW\Nancy.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="App_Data\ASPNETDB.MDF" />
     <Content Include="App_Data\ASPNETDB_log.ldf">
       <DependentUpon>ASPNETDB.MDF</DependentUpon>
@@ -167,6 +192,10 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="..\HttpProcessWrapper\bin\Debug\HttpProcessWrapper.exe.config">
+      <Link>HPW\HttpProcessWrapper.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Properties\PublishProfiles\Azure Test VM.pubxml" />
     <None Include="Properties\PublishProfiles\Local IIS File Copy.pubxml" />
     <None Include="Properties\PublishProfiles\Local IIS WebDeploy.pubxml" />
@@ -216,12 +245,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HttpProcessWrapper\HttpProcessWrapper.csproj">
-      <Project>{35460aa4-b94a-4b64-9418-7243ec3d2f01}</Project>
-      <Name>HttpProcessWrapper</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
