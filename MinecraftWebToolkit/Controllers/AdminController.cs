@@ -192,8 +192,9 @@ namespace MinecraftWebToolkit.Controllers
                 .ToList();
 
             ViewBag.Worlds =
-                Directory.EnumerateFiles(serverPath, "level.dat", SearchOption.AllDirectories)
-                .Select(f => Path.GetFileName(f.Replace("\\level.dat", "")))
+                Directory.EnumerateDirectories(serverPath)
+                .Where(d => FileIO.Exists(d + "\\level.dat"))
+                .Select(d => Path.GetFileName(d))
                 .ToList();
 
             ViewBag.SelWorld = McProperties.GetValue("level-name");
