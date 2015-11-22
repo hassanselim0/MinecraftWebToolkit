@@ -30,6 +30,21 @@ namespace MinecraftWebToolkit.Controllers
             return RedirectToAction("");
         }
 
+        public ActionResult StartHPW()
+        {
+            System.Diagnostics.Process.Start(Server.MapPath(@"~\bin\HPW\HttpProcessWrapper.exe"));
+
+            return RedirectToAction("");
+        }
+
+        public ActionResult StopHPW()
+        {
+            new System.Net.Http.HttpClient().GetAsync("http://localhost:25564/Close");
+            System.Threading.Thread.Sleep(400);
+
+            return RedirectToAction("");
+        }
+
         // User Management
 
         public ActionResult ApproveAccount(string username)

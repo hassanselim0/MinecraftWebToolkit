@@ -9,6 +9,7 @@
             border-width: 1px;
             border-style: solid;
         }
+
         tr:nth-child(even)
         {
             background-color: #DDDDDD;
@@ -59,13 +60,28 @@
 
 <h2>Admin Page</h2>
 
-Server Status: @Html.Action("ServerStatus", "Home")<br />
+Server Status:
+@try
+{
+    @Html.Action("ServerStatus", "Home")
+}
+catch
+{
+    <i>Can't connect to HttpProcessWrapper</i>
+}
+<br />
 <br />
 
 @Html.ActionLink("Kill Server", "KillServer")<br />
 <br />
 
 @Html.ActionLink("Manage Worlds", "ManageWorlds")<br />
+<br />
+
+HttpProcessWrapper:
+@Html.ActionLink("Start", "StartHPW")
+@Html.ActionLink("Stop", "StopHPW")
+<br />
 <br />
 
 Update Server:
