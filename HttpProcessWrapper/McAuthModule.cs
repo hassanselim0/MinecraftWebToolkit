@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 //TODO: Move this to another assembly that gets discovered and loaded automatically
 namespace HttpProcessWrapper
@@ -24,7 +25,8 @@ namespace HttpProcessWrapper
                 if (procs.ContainsKey(procName) && procs[procName].IsRunning)
                     throw new Exception("Minecraft Server Already Running");
 
-                procs[procName] = new McWrapper(Request.Query.cmd, Request.Query.args, Request.Query.dir);
+                procs[procName] = new McWrapper(Request.Query.cmd,
+                    Request.Query.args, Request.Query.dir);
 
                 return 200;
             };
@@ -48,6 +50,8 @@ namespace HttpProcessWrapper
 
         public static bool IsAuthorized(string username, string ip)
         {
+            if (ip == "127.0.0.1") return true;
+
             return userIPs.ContainsKey(username) && userIPs[username] == ip
                 && DateTime.UtcNow.Subtract(userDates[username]).TotalMinutes < 2;
         }
@@ -55,22 +59,26 @@ namespace HttpProcessWrapper
 
     public class McWrapper : ProcWrapper
     {
-        private Dictionary<string, string> userIPs = new Dictionary<string, string>();
-        private Dictionary<string, DateTime> userDates = new Dictionary<string, DateTime>();
+        private Regex loginRegex;
 
         public McWrapper(string cmd, string args, string dir) :
-            base(cmd, args, dir) { }
+            base(cmd, args, dir)
+        {
+            // What I'm trying to parse looks like this:
+            // [hh:mm:ss] [Server thread/INFO]: username[/ip:port] logged in ...
+            // You can interactively try the regex here: http://regexr.com/3c8op
+            loginRegex = new Regex(
+                @"^\[[\d:]+\] \[Server thread\/INFO\]: ([\w.]+)\[\/([\w.]+):\d+\] logged in",
+                RegexOptions.Compiled);
+        }
 
         protected override void proc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             base.proc_OutputDataReceived(sender, e);
 
-            // What I'm trying to parse looks like this:
-            // [hh:mm:ss] [Server thread/INFO]: username[/ip:port] logged in with entity id ### at (X, Y, Z)
-            // You can interactively try the regex here: http://regexr.com/3c7gl
-            var pattern = @"\[Server thread\/INFO\]: ([\w.]+)\[\/([\w.]+):\d+\] logged in";
-            var match = System.Text.RegularExpressions.Regex.Match(e.Data, pattern);
+            if (e.Data == null) return;
 
+            var match = loginRegex.Match(e.Data);
             if (match.Success)
             {
                 var username = match.Groups[1].Value;

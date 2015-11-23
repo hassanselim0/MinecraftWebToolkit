@@ -35,7 +35,8 @@ namespace HttpProcessWrapper
                 if (Procs.ContainsKey(p.name) && Procs[p.name].IsRunning)
                     throw new Exception("Process Already Running");
 
-                Procs[p.name] = new ProcWrapper(Request.Query.cmd, Request.Query.args, Request.Query.dir);
+                Procs[p.name] = new ProcWrapper(Request.Query.cmd,
+                    Request.Query.args, Request.Query.dir);
 
                 return 200;
             };
