@@ -39,8 +39,7 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult StopHPW()
         {
-            new System.Net.Http.HttpClient().GetAsync("http://localhost:25564/Close");
-            System.Threading.Thread.Sleep(400);
+            ProcHttpClient.DoAction("/Close");
 
             return RedirectToAction("");
         }

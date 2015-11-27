@@ -8,6 +8,7 @@ namespace HttpProcessWrapper
     class Program
     {
         static Uri baseUri = new Uri("http://localhost:25564");
+        static NancyHost host;
 
         static void Main(string[] args)
         {
@@ -16,49 +17,56 @@ namespace HttpProcessWrapper
             config.RewriteLocalhost = false;
 
             var bootstrapper = new Bootstrapper();
-            using (var host = new NancyHost(bootstrapper, config, baseUri))
+            host = new NancyHost(bootstrapper, config, baseUri);
+
+            for (int i = 0; ; i++)
             {
-                for (int i = 0; ; i++)
+                try
                 {
+                    host.Start();
+                    break;
+                }
+                catch (HttpListenerException ex)
+                {
+                    // Error 183 happens when the HttpListener fails to listen on the provided Uri
+                    if (ex.ErrorCode != 183 || i >= 10) throw;
+
+                    // Close the already running instance
                     try
                     {
-                        host.Start();
-                        break;
+                        new WebClient().DownloadString(new Uri(baseUri, "/Close"));
+                        System.Threading.Thread.Sleep(40); // Feels like enough :P
                     }
-                    catch (HttpListenerException ex)
-                    {
-                        // Error 183 happens when the HttpListener fails to listen on the provided Uri
-                        if (ex.ErrorCode != 183 || i >= 64) throw;
-                        closeOtherInstances();
-                    }
+                    catch { }
                 }
-
-                Console.WriteLine("Your application is running on: " + baseUri);
-                Console.WriteLine("You can type relative URIs to test routes, or enter an empty line to exit");
-
-                var engine = bootstrapper.GetEngine();
-
-                while (true)
-                {
-                    var line = Console.ReadLine();
-                    if (line == "") break;
-
-                    var req = new Request("GET", new Url(baseUri + line));
-                    var res = engine.HandleRequest(req).Response;
-
-                    Console.WriteLine("Response Code: " + res.StatusCode);
-                    res.Contents(Console.OpenStandardOutput());
-                    Console.WriteLine();
-                }
-
-                ProcModule.KillAllProcs();
             }
+
+            Console.WriteLine("Your application is running on: " + baseUri);
+            Console.WriteLine("You can type relative URIs to test routes, or enter an empty line to exit");
+
+            var engine = bootstrapper.GetEngine();
+
+            while (true)
+            {
+                var line = Console.ReadLine();
+                if (line == "") break;
+
+                var req = new Request("GET", new Url(baseUri + line));
+                var res = engine.HandleRequest(req).Response;
+
+                Console.WriteLine("Response Code: " + res.StatusCode);
+                res.Contents(Console.OpenStandardOutput());
+                Console.WriteLine();
+            }
+
+            ProcModule.KillAllProcs();
+            host.Dispose();
         }
 
-        static void closeOtherInstances()
+        public static void StopHost()
         {
-            new WebClient().DownloadStringAsync(new Uri(baseUri + "/Close"));
-            System.Threading.Thread.Sleep(800);
+            host.Stop();
+            host.Dispose();
         }
     }
 }
