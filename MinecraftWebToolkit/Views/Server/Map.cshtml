@@ -5,40 +5,50 @@
     @if (Roles.IsUserInRole("Moderator"))
     {
         <script type="text/javascript">
-            var ProgressIntervalHandle;
-
             $(document).ready(function()
             {
                 $.ajaxSetup({ cache: false });
-                ChangeProgress();
-                ProgressIntervalHandle = setInterval("ChangeProgress()", 4000);
+
+                RefreshProgress();
             });
 
             function StartMapper()
             {
-                $.get('@Url.Action("StartMapper", new { world = ViewBag.SelWorld })');
+                $.get('@Url.Action("StartMapper", new { world = ViewBag.SelWorld })')
+                    .done(function()
+                    {
+                        setTimeout("RefreshProgress()", 200);
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown)
+                    {
+                        alert(textStatus + ": " + errorThrown + "\r\n" + jqXHR.responseText);
+                    });
+
                 $("#MapperProgress").text("starting...");
                 $("#UpdateBtn").hide();
-                ProgressIntervalHandle = setInterval("ChangeProgress()", 4000);
             }
 
-            function ChangeProgress()
+            function RefreshProgress()
             {
-                $.get('@Url.Action("MapperProgress")', function(result)
-                {
-                    if (result == "")
-                        $("#MapperProgress").text("");
-                    else
-                        $("#MapperProgress").text("(Updating: " + result + ")");
-
-                    if (result == "Completed" || result == "")
+                $.get('@Url.Action("MapperProgress")')
+                    .done(function(result)
                     {
-                        clearInterval(ProgressIntervalHandle);
-                        $("#UpdateBtn").show();
-                    }
-                    else
-                        $("#UpdateBtn").hide();
-                });
+                        if (result == "")
+                            $("#MapperProgress").text("");
+                        else
+                            $("#MapperProgress").text("(Updating: " + result + ")");
+
+                        if (result == "Completed" || result == "")
+                        {
+                            $("#UpdateBtn").show();
+                        }
+                        else
+                        {
+                            $("#UpdateBtn").hide();
+
+                            setTimeout("RefreshProgress()", 4000);
+                        }
+                    });
             }
         </script>
     }
@@ -54,12 +64,13 @@
 <form style="margin-top:-8px; margin-bottom:8px;">
     Worlds:
     @{ var worlds = ViewBag.Worlds as List<string>; }
-    @Html.DropDownList("world", worlds.Select(w => new SelectListItem()
-    {
-        Text = w,
-        Value = w,
-        Selected = w == ViewBag.SelWorld
-    }))
+    @Html.DropDownList("world", worlds.Select(w =>
+        new SelectListItem()
+        {
+            Text = w,
+            Value = w,
+            Selected = w == ViewBag.SelWorld
+        }))
     <input type="submit" value="Switch" />
 </form>
 <iframe src='/mcmap/@ViewBag.SelWorld' style="width: 100%; height: calc(100% - 160px);" />

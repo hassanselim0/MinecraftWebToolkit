@@ -19,9 +19,17 @@ namespace MinecraftWebToolkit.Controllers
 
         public ActionResult Start()
         {
-            ProcHttpClient.StartProc("McServer", WebConfig.AppSettings["JrePath"],
-                "-Xmx1024M -Xms512M -jar " + WebConfig.AppSettings["McJarFile"] + " nogui",
-                WebConfig.AppSettings["McServerPath"]);
+            try
+            {
+                ProcHttpClient.StartProc("McServer", WebConfig.AppSettings["JrePath"],
+                    "-Xmx1024M -Xms512M -jar " + WebConfig.AppSettings["McJarFile"] + " nogui",
+                    WebConfig.AppSettings["McServerPath"]);
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+                return Content(ex.ToString());
+            }
 
             return Content("OK " + DateTime.Now.Ticks);
         }
@@ -43,7 +51,8 @@ namespace MinecraftWebToolkit.Controllers
 
             var result = new
             {
-                Output = log.Aggregate("", (s1, s2) => s1 + HttpUtility.HtmlEncode(s2[1]) + "<br />\r\n"),
+                Output = log.Aggregate("", (s1, s2) =>
+                    s1 + HttpUtility.HtmlEncode(s2[1]) + "<br />\r\n"),
                 LastTimestamp = lastTimestamp,
                 Ticks = DateTime.Now.Ticks,
             };
@@ -75,11 +84,19 @@ namespace MinecraftWebToolkit.Controllers
             if (!Directory.Exists(mapsDir))
                 Directory.CreateDirectory(mapsDir);
 
-            ProcHttpClient.StartProc("Mapper",
-                Path.Combine(serverPath, "Overviewer\\overviewer.exe"),
-                "-p 4 --rendermodes=smooth_lighting,smooth_night \""
-                + world + "\" \"" + Path.Combine("Map", world) + "\"",
-                serverPath);
+            try
+            {
+                ProcHttpClient.StartProc("Mapper",
+                    Path.Combine(serverPath, "Overviewer\\overviewer.exe"),
+                    "-p 4 --rendermodes=smooth_lighting,smooth_night \""
+                    + world + "\" \"" + Path.Combine("Map", world) + "\"",
+                    serverPath);
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+                return Content(ex.ToString());
+            }
 
             return Content("OK " + DateTime.Now.Ticks);
         }

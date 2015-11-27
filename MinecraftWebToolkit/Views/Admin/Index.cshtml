@@ -16,28 +16,27 @@
         }
     </style>
     <script type="text/javascript">
-        var ProgressIntervalHandle;
-
         $(document).ready(function()
         {
             $.ajaxSetup({ cache: false });
 
-            ChangeProgress();
-            ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
+            RefreshProgress();
         });
 
         function StartUpdate()
         {
-            $.get('@Url.Action("UpdateServer")?ver=' + $("#VersionList").val());
+            $.get('@Url.Action("UpdateServer")?ver=' + $("#VersionList").val())
+                .done(function()
+                {
+                    setTimeout("RefreshProgress()", 200);
+                });
 
             $("#UpdateProgress").text("(Starting...)");
-            ProgressIntervalHandle = setInterval("ChangeProgress()", 1000);
-
             $("#VersionList").hide();
             $("#UpdateBtn").hide();
         }
 
-        function ChangeProgress()
+        function RefreshProgress()
         {
             $.get('@Url.Action("UpdateProgress")', function(result)
             {
@@ -46,13 +45,16 @@
                 else
                     $("#UpdateProgress").text("(" + result + ")");
 
+                if (result.indexOf("Error") == 0)
+                    alert(result);
+
                 if (result == "Completed" || result == "" || result.indexOf("Error") == 0)
                 {
-                    clearInterval(ProgressIntervalHandle);
-
                     $("#VersionList").show();
                     $("#UpdateBtn").show();
                 }
+                else
+                    setTimeout("RefreshProgress()", 1000);
             });
         }
     </script>
