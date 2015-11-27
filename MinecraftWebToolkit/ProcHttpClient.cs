@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web;
 
@@ -22,15 +23,25 @@ namespace MinecraftWebToolkit
 
         public static void DoAction(string uri)
         {
-            http.GetAsync(uri).Result
-                .EnsureSuccessStatusCode();
+            var resp = http.GetAsync(uri).Result;
+
+            if (resp.StatusCode == HttpStatusCode.InternalServerError)
+                throw new Exception(resp.Content.ReadAsStringAsync().Result);
+
+            resp.EnsureSuccessStatusCode();
         }
 
         public static string GetResult(string uri)
         {
-            return http.GetAsync(uri).Result
-                .EnsureSuccessStatusCode()
-                .Content.ReadAsStringAsync().Result;
+            var resp = http.GetAsync(uri).Result;
+            var cont = resp.Content.ReadAsStringAsync().Result;
+
+            if (resp.StatusCode == HttpStatusCode.InternalServerError)
+                throw new Exception(cont);
+
+            resp.EnsureSuccessStatusCode();
+
+            return cont;
         }
 
         public static bool IsRunning(string name)
