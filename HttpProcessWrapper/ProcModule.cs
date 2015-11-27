@@ -78,8 +78,6 @@ namespace HttpProcessWrapper
 
             Get["/Close"] = _ =>
             {
-                KillAllProcs();
-
                 var resp = new Response().WithStatusCode(200);
 
                 resp.Contents = stream =>
