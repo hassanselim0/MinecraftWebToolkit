@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using FileIO = System.IO.File;
 using WebConfig = System.Web.Configuration.WebConfigurationManager;
 
 namespace MinecraftWebToolkit.Controllers
@@ -66,8 +67,9 @@ namespace MinecraftWebToolkit.Controllers
             var serverPath = WebConfig.AppSettings["McServerPath"];
 
             ViewBag.Worlds =
-                Directory.EnumerateFiles(serverPath, "level.dat", SearchOption.AllDirectories)
-                .Select(f => Path.GetFileName(f.Replace("\\level.dat", "")))
+                Directory.EnumerateDirectories(serverPath)
+                .Where(d => FileIO.Exists(d + "\\level.dat"))
+                .Select(d => Path.GetFileName(d))
                 .ToList();
 
             ViewBag.SelWorld = world ?? McProperties.GetValue("level-name");
